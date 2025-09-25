@@ -3,11 +3,12 @@ package jp.co.sss.crud.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jp.co.sss.crud.entity.Employee;
 import jp.co.sss.crud.form.LoginForm;
 import jp.co.sss.crud.mapper.EmployeeMapper;
 
 /**
- * ログイン処理
+ * ログイン処理サービス
  */
 @Service
 public class LoginService {
@@ -17,15 +18,20 @@ public class LoginService {
 
 	/**
 	 * ログイン処理
-	 * 
-	 * mapper#findByEmpIdAndEmpPassメソッドを呼び出し、DBから該当社員を取得する。
-	 * 取得した社員オブジェクトがnullの場合はログイン失敗、そうでない場合はログイン成功としてLoginResultのメソッドを呼び出す。
-	 * 
-	 * @return LoginResult ログイン失敗時はLoginResult.failLogin,ログイン成功時はLoginResult.succeedLoginを呼び出す。
+	 *
+	 * @param loginForm ログインフォーム
+	 * @return LoginResult ログイン成功/失敗の結果
 	 */
-	public LoginResult execute(LoginForm loginForm) {
-		return null;
+	public LoginResult login(LoginForm loginForm) {
+		// DBから社員情報を取得
+		Employee employee = mapper.findByEmpIdAndEmpPass(loginForm.getEmpId(), loginForm.getEmpPass());
 
+		if (employee != null) {
+			// ログイン成功
+			return LoginResult.succeedLogin(employee);
+		} else {
+			// ログイン失敗
+			return LoginResult.failLogin("社員IDまたはパスワードが間違っています。");
+		}
 	}
-
 }

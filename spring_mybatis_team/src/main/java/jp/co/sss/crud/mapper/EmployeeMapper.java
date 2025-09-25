@@ -47,7 +47,8 @@ public interface EmployeeMapper {
 	 * @param empPass
 	 * @return ログインユーザーエンティティ
 	 */
-	Employee findByEmpIdAndEmpPass(@Param(value = "empId") int empId, @Param(value = "empPass") String empPass);
+	Employee findByEmpIdAndEmpPass(@Param("empId") Integer empId,
+			@Param("empPass") String empPass);
 
 	/**
 	 * 社員主キー検索

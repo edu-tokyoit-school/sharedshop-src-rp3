@@ -1,46 +1,34 @@
 package jp.co.sss.crud.form;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+/**
+ * ログインフォーム
+ */
 public class LoginForm {
 
-	//TODO フィールドに必要なアノテーションを付与しバリデーションを行うこと
 	/** 社員ID */
+	@NotNull(message = "社員IDを入力してください")
 	private Integer empId;
 
 	/** パスワード */
+	@NotNull(message = "パスワードを入力してください")
+	@Size(min = 4, message = "パスワードは4文字以上で入力してください")
 	private String empPass;
 
-	/**
-	 * 社員IDの取得
-	 *
-	 * @return 社員ID
-	 */
 	public Integer getEmpId() {
 		return empId;
 	}
 
-	/**
-	 * 社員IDのセット
-	 *
-	 * @param empId 社員ID
-	 */
 	public void setEmpId(Integer empId) {
 		this.empId = empId;
 	}
 
-	/**
-	 * パスワードの取得
-	 *
-	 * @return パスワード
-	 */
 	public String getEmpPass() {
 		return empPass;
 	}
 
-	/**
-	 * パスワードのセット
-	 *
-	 * @param empPass パスワード
-	 */
 	public void setEmpPass(String empPass) {
 		this.empPass = empPass;
 	}

@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import jp.co.sss.crud.form.LoginForm;
+import jp.co.sss.crud.service.LoginResult;
 import jp.co.sss.crud.service.LoginService;
 
 @Controller
@@ -25,58 +26,67 @@ public class IndexController {
 
 	/**
 	 * ログイン画面の表示
-	 * 
-	 * @param loginForm
-	 * @return 遷移先ビュー
+	 * GET / にアクセスされたときログイン画面を返す
+	 *
+	 * @param loginForm LoginForm
+	 * @return index.htmlビュー
 	 */
-	@RequestMapping(path = "/", method = RequestMethod.GET)
+	@GetMapping("/")
 	public String index(@ModelAttribute LoginForm loginForm) {
-		session.invalidate();
+		session.invalidate(); // セッション破棄
 		return "index";
 	}
 
 	/**
 	 * ログインコントローラー
-	 * 
-	 * @param loginForm
-	 * @param result エラー検知オブジェクト
-	 * @param session 
-	 * @param model リクエストスコープの操作
+	 * POST /login でログイン処理を実施
+	 *
+	 * @param loginForm フォーム入力データ
+	 * @param result    入力エラー判定
+	 * @param session   セッション
+	 * @param model     モデル（エラーメッセージ登録用）
 	 * @return 遷移先ビュー
 	 */
-	@RequestMapping(path = "/login", method = RequestMethod.POST)
+	@PostMapping("/login")
 	public String login(@Valid @ModelAttribute LoginForm loginForm, BindingResult result, HttpSession session,
 			Model model) {
 
-		//TODO 入力エラーがある場合、result.hasErrorsメソッドを呼びだしindex.htmlへ戻る
-		if (false) {
-		}
-
-		//TODO loginServiceのメソッドを呼びだし、LoginResult型のオブジェクトへ代入する
-
-		//TODO loginResult.isLoginの結果がtrueの場合、ログイン成功でセッションに"user"という名前でセッションにユーザーの情報を登録する
-		if (true) {
-
-			//TODO セッションにuser登録
-
-			// 一覧へリダイレクト
-			return "redirect:/list";
-			//TODO loginResult.isLoginの結果がfalseの場合、loginResult.getErrorMsgメソッドを呼びだし、modelスコープに登録する
-		} else {//ログイン失敗時
-
-			//TODO loginResult.getErrorMsgを呼び出し、メッセージをmodelスコープに登録
-
+		// 入力エラーがある場合、index.htmlへ戻す
+		if (result.hasErrors()) {
 			return "index";
 		}
 
+		// loginServiceを呼び出し
+		LoginResult loginResult = loginService.login(loginForm);
+
+		System.out.println("empId=" + loginForm.getEmpId());
+		System.out.println("empPass=" + loginForm.getEmpPass());
+
+		// ログイン成功時
+		if (loginResult.isLogin()) {
+			// セッションに"user"を登録
+			session.setAttribute("user", loginResult.getLoginUser());
+
+			// 一覧画面へリダイレクト
+			return "redirect:/list";
+		}
+		// ログイン失敗時
+		else {
+			// エラーメッセージをmodelスコープに登録
+			model.addAttribute("errorMsg", loginResult.getErrorMsg());
+
+			return "index";
+		}
 	}
 
-	@RequestMapping(path = "/logout", method = RequestMethod.GET)
+	/**
+	 * ログアウト処理
+	 *
+	 * @return index.htmlビュー
+	 */
+	@GetMapping("/logout")
 	public String logout() {
-		//TODO セッションの破棄
-
-		//index.htmlへ遷移
+		session.invalidate(); // セッション破棄
 		return "redirect:/";
 	}
-
 }
